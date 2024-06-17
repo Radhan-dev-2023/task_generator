@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "518644364990",
+    "project_id": "taskassigner-74233",
+    "storage_bucket": "taskassigner-74233.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518644364990:android:8ad85ba1a77d65b7ef50ef",
+        "android_client_info": {
+          "package_name": "com.example.task_assigner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVxJxmWlDb6bU47GBPcxYzH8fASYt1Kfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
