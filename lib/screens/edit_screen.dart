@@ -43,7 +43,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
         backgroundColor: blue,
         automaticallyImplyLeading: true,
         title: const Text(
-          'Edit Task',
+          'Edit Tasks',
           style: TextStyle(fontWeight: FontWeight.bold, color: white),
         ),
       ),
