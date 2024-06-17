@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:task_assigner/Widgets/text_field.dart';
 
-import 'Widgets/spacing.dart';
+import '../Widgets/spacing.dart';
+import '../constants/colors.dart';
 
 class TaskEditScreen extends StatefulWidget {
   final String taskId;
   final Map<String, dynamic> taskData;
 
-  TaskEditScreen({required this.taskId, required this.taskData});
+  const TaskEditScreen({super.key, required this.taskId, required this.taskData});
 
   @override
   _TaskEditScreenState createState() => _TaskEditScreenState();
@@ -38,11 +40,11 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: blue,
         automaticallyImplyLeading: true,
-        title: Text(
+        title: const Text(
           'Edit Task',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: white),
         ),
       ),
       body: Padding(
@@ -67,7 +69,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -75,10 +77,14 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
                     onPressed: () {
                       _saveChanges();
                       Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Task Edited successfully')),
+                      );
                     },
-                    child: Text(
+                    child: const Text(
                       "SAVE",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: black),
                     ),
                   ),
                 )
@@ -94,7 +100,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Completion Status',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
@@ -109,7 +115,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
           },
         ),*/
         RadioListTile<String>(
-          title: Text('On Progress'),
+          title: const Text('On Progress'),
           value: 'On Progress',
           groupValue: _completionStatus,
           onChanged: (value) {
@@ -119,7 +125,7 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
           },
         ),
         RadioListTile<String>(
-          title: Text('Completed'),
+          title: const Text('Completed'),
           value: 'Completed',
           groupValue: _completionStatus,
           onChanged: (value) {
@@ -136,8 +142,8 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
-        var _firestore = FirebaseFirestore.instance;
-        var userDocRef = _firestore.collection("users").doc(uid);
+        var firestore = FirebaseFirestore.instance;
+        var userDocRef = firestore.collection("users").doc(uid);
         var tasksCollectionRef = userDocRef.collection('tasks');
 
         await tasksCollectionRef.doc(widget.taskId).update({
@@ -149,10 +155,12 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
           'completionStatus': _completionStatus,
         });
 
-        // Show success message or perform any other actions
+
       }
     } catch (e) {
-      print("Error updating task: $e");
+      if (kDebugMode) {
+        print("Error updating task: $e");
+      }
     }
   }
 

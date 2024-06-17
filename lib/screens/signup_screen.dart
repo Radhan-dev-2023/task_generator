@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:task_assigner/widgets/navigation.dart';
 
 
-import '../Services/authentication.dart';
+import '../../Services/authentication.dart';
 
-import 'Login_screen.dart';
-import 'Widgets/buttons.dart';
-import 'Widgets/snackbar.dart';
-import 'Widgets/text_field.dart';
-import 'home_screen.dart';
+import 'home_Screen.dart';
+import 'login_screen.dart';
+import '../Widgets/buttons.dart';
+import '../Widgets/snackbar.dart';
+import '../Widgets/text_field.dart';
+
 
 
 class SignupScreen extends StatefulWidget {
@@ -46,14 +48,8 @@ class _SignupScreenState extends State<SignupScreen> {
         isLoading = false;
       });
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) =>  HomeScreen(),
-        ),
-      );}
-    // }else if(passwordController.text.length==7){
-    //   return showSnackBar(context, "Password is too short");
-    // }
+     navigateToScreen(context, HomeScreen());
+    }
     else {
       setState(() {
         isLoading = false;
@@ -106,11 +102,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     const Text("Already have an account?"),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        navigatesToScreen(context,LoginScreen());
                       },
                       child: const Text(
                         " Login",

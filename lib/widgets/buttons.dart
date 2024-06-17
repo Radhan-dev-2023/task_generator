@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants/colors.dart';
+
 class MyButtons extends StatelessWidget {
   final VoidCallback onTap;
   final String text;
@@ -24,7 +26,7 @@ class MyButtons extends StatelessWidget {
                   Radius.circular(30),
                 ),
               ),
-              color: Colors.blue),
+              color: blue),
           child: Text(
             text,
             style: const TextStyle(

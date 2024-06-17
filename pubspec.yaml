@@ -39,7 +39,7 @@ dependencies:
   firebase_core:
   cloud_firestore:
   shared_preferences:
-  intl:
+  flutter_local_notifications: ^12.0.0
   google_fonts:
 
 

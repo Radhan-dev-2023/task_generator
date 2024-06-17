@@ -1,12 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:task_assigner/TaskList_screem.dart';
-import 'package:task_assigner/Widgets/text_field.dart';
 
-import 'Widgets/spacing.dart';
+import 'package:task_assigner/Widgets/snackbar.dart';
+import 'package:task_assigner/Widgets/text_field.dart';
+import 'package:task_assigner/Widgets/text_styles.dart';
+import 'package:task_assigner/widgets/navigation.dart';
+
+import '../Widgets/spacing.dart';
+import '../constants/colors.dart';
+import 'login_screen.dart';
+import 'tasklist_screem.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const String routeName = '/home';
   const HomeScreen({super.key});
 
   @override
@@ -14,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   CollectionReference users = FirebaseFirestore.instance.collection('uid');
 
@@ -62,31 +69,31 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const TaskListScreen(), // Navigate to TaskListScreen
-                    ),
-                  );
+                onPressed: ()  {
+                  try {
+                     FirebaseAuth.instance.signOut();
+                    showSnackBar(context, "LogOut is Successfully Done");
+                    navigateToScreen(context, const LoginScreen());
+                  } catch (e) {
+                    print("Error signing out: $e");
+                    showSnackBar(context, "Failed to sign out");
+                  }
                 },
-                icon: const Icon(Icons.access_time_rounded),
+                icon: const Icon(Icons.logout,color: white,),
               ),
               IconButton(
                 onPressed: () {
-                  FirebaseAuth.instance.signOut();
+                  navigatesToScreen(context, const TaskListScreen());
                 },
-                icon: const Icon(Icons.logout),
+                icon: const Icon(Icons.view_list,color: white,),
               ),
             ],
           ),
         ],
-        automaticallyImplyLeading: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: blue,
         title: const Text(
           "Task Details",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -98,11 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
               mediumSpacing(context),
               const Text(
                 "Task Title :",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: boldTextStyle
               ),
               mediumSpacing(context),
               TextFieldInput(
@@ -113,11 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
               largeSpacing(context),
               const Text(
                 "Task Description :",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: boldTextStyle
               ),
               mediumSpacing(context),
               TextFieldInput(
@@ -129,11 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
               largeSpacing(context),
               const Text(
                 "Task Deadline :",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: boldTextStyle
               ),
               mediumSpacing(context),
               Row(
@@ -164,11 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
               largeSpacing(context),
               const Text(
                 "Task Estimated Time :",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: boldTextStyle
               ),
               mediumSpacing(context),
               TextFieldInputs(
@@ -182,11 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
               largeSpacing(context),
               const Text(
                 "Completion Status",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: boldTextStyle
               ),
               mediumSpacing(context),
               Row(
@@ -221,16 +208,22 @@ class _HomeScreenState extends State<HomeScreen> {
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: blue,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
                   onPressed: () async {
                     String? uid = FirebaseAuth.instance.currentUser?.uid;
-                    if (uid != null) {
+                    if (uid != null&&
+                        titleController.text.isNotEmpty &&
+                        descriptionController.text.isNotEmpty &&
+                        dateController.text.isNotEmpty &&
+                        timeController.text.isNotEmpty &&
+                        estimatedController.text.isNotEmpty) {
+
                       try {
-                        var _firestore = FirebaseFirestore.instance;
+                        var firestore = FirebaseFirestore.instance;
                         var userDocRef =
-                            _firestore.collection("users").doc(uid);
+                            firestore.collection("users").doc(uid);
                         var tasksCollectionRef = userDocRef.collection('tasks');
                         await tasksCollectionRef.add({
                           'title': titleController.text,
@@ -241,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'completionStatus': completionStatus,
                         });
 
+                       await showSnackBar(context, "Task Assigned successfully");
                         titleController.clear();
                         descriptionController.clear();
                         dateController.clear();
@@ -253,11 +247,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         print("error>>>>>>>>$e");
                       }
                     }
+                    else{
+                     showSnackBar(context, "Please fill in all fields");
+                    }
                   },
-                  child: const Text(
+                  child:  Text(
                     "Assign a Task",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
+                    style: differColor(white),
                   ),
                 ),
               )

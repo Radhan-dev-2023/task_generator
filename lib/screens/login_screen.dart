@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
 
-import '../Services/authentication.dart';
+import '../../Services/authentication.dart';
 
-import 'Sign_up.dart';
-import 'Widgets/buttons.dart';
-import 'Widgets/snackbar.dart';
-import 'Widgets/text_field.dart';
-import 'home_screen.dart';
+import '../widgets/navigation.dart';
+import 'home_Screen.dart';
+import 'signup_screen.dart';
+import '../Widgets/buttons.dart';
+import '../Widgets/snackbar.dart';
+import '../Widgets/text_field.dart';
+import '../constants/colors.dart';
+
 
 
 class LoginScreen extends StatefulWidget {
+  static const String routeName = '/login';
   const LoginScreen({super.key});
 
   @override
@@ -42,11 +46,7 @@ class _SignupScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = false;
       });
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) =>  HomeScreen(),
-        ),
-      );
+      navigateToScreen(context, const HomeScreen());
     } else {
       setState(() {
         isLoading = false;
@@ -60,7 +60,7 @@ class _SignupScreenState extends State<LoginScreen> {
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       body: SafeArea(
           child: SizedBox(
             child: Column(
@@ -91,11 +91,11 @@ class _SignupScreenState extends State<LoginScreen> {
                   //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Expanded(
-                      child: Container(height: 1, color: Colors.black26),
+                      child: Container(height: 1, color: black),
                     ),
                     const Text("  or  "),
                     Expanded(
-                      child: Container(height: 1, color: Colors.black26),
+                      child: Container(height: 1, color:black),
                     )
                   ],
                 ),
@@ -106,11 +106,7 @@ class _SignupScreenState extends State<LoginScreen> {
                     const Text("Don't have an account? "),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const SignupScreen(),
-                          ),
-                        );
+                        navigatesToScreen(context, const SignupScreen());
                       },
                       child: const Text(
                         "SignUp",
