@@ -1,4 +1,4 @@
-![48bd7c6e9b128643ba415cea5c6b3ede](https://github.com/Radhan-dev-2023/task_generator/assets/170162265/41fd6a28-379e-439d-8866-3f080c7bce90)# Task Generator
+# Task Generator
 
 The Task Generator application allows users to efficiently manage their tasks. Users can:
 
