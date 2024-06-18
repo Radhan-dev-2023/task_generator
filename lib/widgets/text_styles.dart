@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const TextStyle boldTextStyle = TextStyle(
+ TextStyle boldTextStyle = const TextStyle(
   color: Colors.black,
   fontSize: 22,
   fontWeight: FontWeight.bold,
@@ -13,3 +13,4 @@ TextStyle differColor(Color? colors){
     fontWeight: FontWeight.bold,
   );
 }
+

@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthMethod {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -31,8 +30,6 @@ class AuthMethod {
           'uid': cred.user!.uid,
           'email': email,
         });
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('userid', cred.user!.uid);
 
         res = "success";
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_assigner/Widgets/spacing.dart';
 import 'package:task_assigner/widgets/navigation.dart';
 
 
@@ -48,13 +49,13 @@ class _SignupScreenState extends State<SignupScreen> {
         isLoading = false;
       });
 
-     navigateToScreen(context, HomeScreen());
+     navigateToScreen(context, const HomeScreen());
     }
     else {
       setState(() {
         isLoading = false;
       });
-      // show error
+
       showSnackBar(context, res);
     }
   }
@@ -95,14 +96,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   isPass: true,
                 ),
                 MyButtons(onTap: signupUser, text: "Sign Up"),
-                const SizedBox(height: 50),
+                largeSpacing(context),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account?"),
                     GestureDetector(
                       onTap: () {
-                        navigatesToScreen(context,LoginScreen());
+                        navigatesToScreen(context,const LoginScreen());
                       },
                       child: const Text(
                         " Login",
@@ -110,7 +111,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     )
                   ],
-                )
+                ),
+                mediumSpacing(context),
               ],
             ),
           )),

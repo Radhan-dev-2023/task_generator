@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:task_assigner/Widgets/snackbar.dart';
 import 'package:task_assigner/Widgets/text_field.dart';
 import 'package:task_assigner/Widgets/text_styles.dart';
+import 'package:task_assigner/widgets/alert_dialog.dart';
 import 'package:task_assigner/widgets/navigation.dart';
-
 import '../Widgets/spacing.dart';
 import '../constants/colors.dart';
+import '../main.dart';
 import 'login_screen.dart';
-import 'tasklist_screem.dart';
+import 'tasklist_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home';
+
   const HomeScreen({super.key});
 
   @override
@@ -21,8 +23,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   CollectionReference users = FirebaseFirestore.instance.collection('uid');
 
   final TextEditingController titleController = TextEditingController();
@@ -49,18 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
     updateEstimatedTimeController();
   }
 
-  void updateDeadlineTimeController() {
-    String period = _deadlineTime.period == DayPeriod.am ? 'AM' : 'PM';
-    timeController.text =
-        "${_deadlineTime.hourOfPeriod}:${_deadlineTime.minute} $period";
-  }
-
-  void updateEstimatedTimeController() {
-    String period = _estimatedTime.period == DayPeriod.am ? 'AM' : 'PM';
-    estimatedController.text =
-        "${_estimatedTime.hourOfPeriod}:${_estimatedTime.minute} $period";
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,23 +57,28 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: ()  {
+                onPressed: () {
+                  navigatesToScreen(context, const TaskListScreen());
+                },
+                icon: const Icon(
+                  Icons.view_list,
+                  color: white,
+                ),
+              ),
+              IconButton(
+                onPressed: () async {
                   try {
-                     FirebaseAuth.instance.signOut();
-                    showSnackBar(context, "LogOut is Successfully Done");
-                    navigateToScreen(context, const LoginScreen());
+                    FirebaseAuth.instance.signOut();
+                    showMyDialog(context);
                   } catch (e) {
                     print("Error signing out: $e");
                     showSnackBar(context, "Failed to sign out");
                   }
                 },
-                icon: const Icon(Icons.logout,color: white,),
-              ),
-              IconButton(
-                onPressed: () {
-                  navigatesToScreen(context, const TaskListScreen());
-                },
-                icon: const Icon(Icons.view_list,color: white,),
+                icon: const Icon(
+                  Icons.logout,
+                  color: white,
+                ),
               ),
             ],
           ),
@@ -103,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               mediumSpacing(context),
-              const Text(
+              Text(
                 "Task Title :",
-                style: boldTextStyle
+                style: boldTextStyle,
               ),
               mediumSpacing(context),
               TextFieldInput(
@@ -114,9 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 textInputType: TextInputType.text,
               ),
               largeSpacing(context),
-              const Text(
+              Text(
                 "Task Description :",
-                style: boldTextStyle
+                style: boldTextStyle,
               ),
               mediumSpacing(context),
               TextFieldInput(
@@ -126,9 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 maxlines: 3,
               ),
               largeSpacing(context),
-              const Text(
+              Text(
                 "Task Deadline :",
-                style: boldTextStyle
+                style: boldTextStyle,
               ),
               mediumSpacing(context),
               Row(
@@ -157,9 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               largeSpacing(context),
-              const Text(
+              Text(
                 "Task Estimated Time :",
-                style: boldTextStyle
+                style: boldTextStyle,
               ),
               mediumSpacing(context),
               TextFieldInputs(
@@ -171,9 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 textInputType: TextInputType.text,
               ),
               largeSpacing(context),
-              const Text(
+              Text(
                 "Completion Status",
-                style: boldTextStyle
+                style: boldTextStyle,
               ),
               mediumSpacing(context),
               Row(
@@ -213,17 +206,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(10))),
                   onPressed: () async {
                     String? uid = FirebaseAuth.instance.currentUser?.uid;
-                    if (uid != null&&
+                    if (uid != null &&
                         titleController.text.isNotEmpty &&
                         descriptionController.text.isNotEmpty &&
                         dateController.text.isNotEmpty &&
                         timeController.text.isNotEmpty &&
                         estimatedController.text.isNotEmpty) {
-
                       try {
-                        var firestore = FirebaseFirestore.instance;
-                        var userDocRef =
-                            firestore.collection("users").doc(uid);
+                        var fireStore = FirebaseFirestore.instance;
+                        var userDocRef = fireStore.collection("users").doc(uid);
                         var tasksCollectionRef = userDocRef.collection('tasks');
                         await tasksCollectionRef.add({
                           'title': titleController.text,
@@ -234,7 +225,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           'completionStatus': completionStatus,
                         });
 
-                       await showSnackBar(context, "Task Assigned successfully");
+                        DateTime deadlineDateTime = DateTime(
+                          _dateTime.year,
+                          _dateTime.month,
+                          _dateTime.day,
+                          _deadlineTime.hour,
+                          _deadlineTime.minute,
+                        );
+
+                        scheduleNotification(
+                            titleController.text, deadlineDateTime);
+
+                        await showSnackBar(
+                            context, "Task Assigned successfully");
+
                         titleController.clear();
                         descriptionController.clear();
                         dateController.clear();
@@ -246,12 +250,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       } catch (e) {
                         print("error>>>>>>>>$e");
                       }
-                    }
-                    else{
-                     showSnackBar(context, "Please fill in all fields");
+                    } else {
+                      showSnackBar(context, "Please fill in all fields");
                     }
                   },
-                  child:  Text(
+                  child: Text(
                     "Assign a Task",
                     style: differColor(white),
                   ),
@@ -304,5 +307,41 @@ class _HomeScreenState extends State<HomeScreen> {
         updateEstimatedTimeController();
       });
     }
+  }
+
+  void updateDeadlineTimeController() {
+    String period = _deadlineTime.period == DayPeriod.am ? 'AM' : 'PM';
+    timeController.text =
+        "${_deadlineTime.hourOfPeriod}:${_deadlineTime.minute.toString().padLeft(2, '0')} $period";
+  }
+
+  void updateEstimatedTimeController() {
+    String period = _estimatedTime.period == DayPeriod.am ? 'AM' : 'PM';
+    estimatedController.text =
+        "${_estimatedTime.hourOfPeriod}:${_estimatedTime.minute.toString().padLeft(2, '0')} $period";
+  }
+
+  void scheduleNotification(String title, DateTime deadline) async {
+    final scheduledNotificationDateTime =
+        deadline.subtract(const Duration(minutes: 10));
+
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'task_reminder',
+      'Task Reminder',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.schedule(
+      title.hashCode,
+      'Task Reminder',
+      'Your task "$title" is due in 10 minutes',
+      scheduledNotificationDateTime,
+      platformChannelSpecifics,
+      androidAllowWhileIdle: true,
+    );
   }
 }

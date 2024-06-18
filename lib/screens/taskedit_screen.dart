@@ -104,16 +104,6 @@ class _TaskEditScreenState extends State<TaskEditScreen> {
           'Completion Status',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-      /*  RadioListTile<String>(
-          title: Text('Not Started'),
-          value: 'Not Started',
-          groupValue: _completionStatus,
-          onChanged: (value) {
-            setState(() {
-              _completionStatus = value!;
-            });
-          },
-        ),*/
         RadioListTile<String>(
           title: const Text('On Progress'),
           value: 'On Progress',
