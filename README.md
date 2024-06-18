@@ -1,4 +1,4 @@
-# task_assigner
+# Task Generator
 
 A new Flutter project.
 
